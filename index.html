@@ -62,52 +62,6 @@
         static loadingIndicator = '<p class="text-stone-50">Loading...</p>';
 
         init() {
-          this.loadData();
-        }
-
-        async loadData() {
-          this.showVehicleLoadingIndicator();
-          this.showStarshipLoadingIndicator();
-
-          const [ vehicleData, starshipData ] = await Promise.allSettled([
-            this.loadVehicles().then((vehicles) => {
-              return Promise.all(vehicles.map(async (vehicle) => ({
-                ...vehicle,
-                filmNames: (await this.loadFilmsForVehicle(vehicle)).map(({ title }) => title)
-              })));
-            }),
-            this.loadStarships()
-          ]);
- 
-          if (vehicleData.status === 'fulfilled') {
-            const vehicles = vehicleData.value.map(this.renderVehicle).join('');
-            document.getElementById('vehicles').innerHTML = vehicles;
-          }
-
-          if (starshipData.status === 'fulfilled') {
-            const starships = starshipData.value.map(this.renderVehicle).join('');
-            document.getElementById('starships').innerHTML = starships;
-          }
-        }
-
-        loadVehicles() {
-          return delay().then(() => {
-            return fetch('https://swapi.info/api/vehicles/')
-              .then((response) => response.json())
-              .then((data) => data.slice(0, 6));
-          });
-        }
-
-        loadStarships() {
-          return delay().then(() => {
-            return fetch('https://swapi.info/api/starships/')
-              .then((response) => response.json())
-              .then((data) => data.slice(0, 6));
-          });
-        }
-
-        loadFilmsForVehicle({ films }) {
-          return Promise.all(films.map((film) => fetch(film).then((res) => res.json())));
         }
 
         renderVehicle({ name, manufacturer, cost_in_credits, filmNames = [] }) {

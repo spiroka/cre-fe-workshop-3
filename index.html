@@ -24,12 +24,12 @@
 
       <section class="p-6">
         <h2 class="text-stone-50 text-4xl font-semibold">Vehicles</h2>
-        <div id="vehicles" class="grid w-full grid-cols-1 gap-12 mx-auto lg:grid-cols-3 "></div>
+        <div id="vehicles" class="grid w-full grid-cols-1 gap-12 mx-auto lg:grid-cols-3"></div>
       </section>
 
       <section class="p-6">
         <h2 class="text-stone-50 text-4xl font-semibold">Starships</h2>
-        <div id="starships" class="grid w-full grid-cols-1 gap-12 mx-auto lg:grid-cols-3 "></div>
+        <div id="starships" class="grid w-full grid-cols-1 gap-12 mx-auto lg:grid-cols-3"></div>
       </section>
     </main>
     <script>
@@ -37,52 +37,116 @@
         return new Promise((resolve) => setTimeout(resolve, 1000));
       }
 
+      function el(type, children, className) {
+        const el = document.createElement(type);
+        if (children) el.append(...children);
+        if (className) el.className = className;
+        return el;
+      }
+
       class StarWarsApp {
-        static vehicleTemplate = `
-          <div class="flex flex-col mb-12 overflow-hidden">
-            <div class="flex flex-col justify-between flex-1">
-              <div class="flex-1">
-                <div class="pt-6 space-x-1 text-sm text-amber-300">
-                  [MANUFACTURER]
-                </div>
-                <div class="block mt-2 space-y-6">
-                  <h3 class="text-2xl font-semibold leading-none tracking-tighter text-stone-50">[NAME]</h3>
-                  <p class="text-sm text-amber-300">
-                    Movies: [FILMS]
-                  </p>
-                  <div class="flex items-center mt-6">
-                    <p class="text-sm font-medium text-stone-400">[PRICE] credits</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
+        static vehicleNode = el(
+          'div',
+          [
+            el(
+              'div',
+              [
+                el(
+                  'div',
+                  [
+                    el(
+                      'div',
+                      [],
+                      'pt-6 space-x-1 text-sm text-amber-300 manufacturer'
+                    ),
+                    el(
+                      'div',
+                      [
+                        el('h3', [], 'text-2xl font-semibold leading-none tracking-tighter text-stone-50 name'),
+                        el(
+                          'div',
+                          [el('p', [], 'text-sm font-medium text-stone-400 price')],
+                          'flex items-center mt-6'
+                        )
+                      ],
+                      'block mt-2 space-y-6'
+                    )
+                  ],
+                  'flex-1'
+                )
+              ],
+              'flex flex-col justify-between flex-1'
+            )
+          ],
+          'flex flex-col mb-12 overflow-hidden vehicle'
+        );
 
-        static loadingIndicator = '<p class="text-stone-50">Loading...</p>';
+        static loadingIndicator = el('p', ['Loading...'], 'text-stone-50 loading-indicator');
 
-        init() {
+        init = async () => {
+          this.showVehicleLoadingIndicator();
+          this.showStarshipLoadingIndicator();
+
+          const [vehiclesResponse, starshipsResponse] = await Promise.allSettled([
+            this.loadVehicles().catch(e => {
+              console.error(e);
+              return [];
+            }),
+            this.loadStarships()
+          ]);
+
+          if (vehiclesResponse.status === 'fulfilled') {
+            const vehicles = vehiclesResponse.value.slice(0, 6).map(this.renderVehicle);
+            document.getElementById('vehicles').querySelector('.loading-indicator').replaceWith(...vehicles);
+          } else {
+            document.getElementById('vehicles').querySelector('.loading-indicator').replaceWith('Some error happened.');
+          }
+
+          if (starshipsResponse.status === 'fulfilled') {
+            const starships = starshipsResponse.value.slice(0, 6).map(this.renderVehicle);
+            document.getElementById('starships').replaceChildren(...starships);
+          }
+
+          document.querySelectorAll('.vehicle').forEach(el => {
+            const price = parseInt(el.querySelector('.price').textContent.split(' ')[0], 10);
+            if (price > 1e6) {
+              el.style.border = '2px solid gold';
+            }
+          });
+        }
+
+        async loadVehicles() {
+          await delay();
+          const res = await fetch("https://swapi.info/api/vehicles");
+          return res.json();
+        }
+
+        async loadStarships() {
+          await delay();
+          const res2 = await fetch("https://swapi.info/api/starships");
+          return res2.json();
         }
 
         renderVehicle({ name, manufacturer, cost_in_credits, filmNames = [] }) {
-          return StarWarsApp.vehicleTemplate
-            .replace('[NAME]', name)
-            .replace('[MANUFACTURER]', manufacturer)
-            .replace('[PRICE]', cost_in_credits)
-            .replace('[FILMS]', filmNames.join(', '));
+          const vehicleEl = StarWarsApp.vehicleNode.cloneNode(true);
+          vehicleEl.querySelector('.name').textContent = name;
+          vehicleEl.querySelector('.manufacturer').textContent = manufacturer;
+          vehicleEl.querySelector('.price').textContent = `${cost_in_credits} credits`;
+
+          return vehicleEl;
         }
 
         showVehicleLoadingIndicator() {
-          document.getElementById('vehicles').innerHTML = StarWarsApp.loadingIndicator;
+          document.getElementById('vehicles').append(StarWarsApp.loadingIndicator.cloneNode(true));
         }
 
         showStarshipLoadingIndicator() {
-          document.getElementById('starships').innerHTML = StarWarsApp.loadingIndicator;
+          document.getElementById('starships').append(StarWarsApp.loadingIndicator.cloneNode(true));
         }
       }
 
-      const app = new StarWarsApp();
-      app.init();
+      const { init } = new StarWarsApp();
+      init();
     </script>
   </body>
 </html>

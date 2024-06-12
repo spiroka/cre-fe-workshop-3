@@ -24,12 +24,12 @@
 
       <section class="p-6">
         <h2 class="text-stone-50 text-4xl font-semibold">Vehicles</h2>
-        <div id="vehicles" class="grid w-full grid-cols-1 gap-12 mx-auto lg:grid-cols-3 "></div>
+        <div id="vehicles" class="grid w-full grid-cols-1 gap-12 mx-auto lg:grid-cols-3"></div>
       </section>
 
       <section class="p-6">
         <h2 class="text-stone-50 text-4xl font-semibold">Starships</h2>
-        <div id="starships" class="grid w-full grid-cols-1 gap-12 mx-auto lg:grid-cols-3 "></div>
+        <div id="starships" class="grid w-full grid-cols-1 gap-12 mx-auto lg:grid-cols-3"></div>
       </section>
     </main>
     <script>
@@ -39,7 +39,7 @@
 
       class StarWarsApp {
         static vehicleTemplate = `
-          <div class="flex flex-col mb-12 overflow-hidden">
+          <div class="flex flex-col mb-12 overflow-hidden vehicle">
             <div class="flex flex-col justify-between flex-1">
               <div class="flex-1">
                 <div class="pt-6 space-x-1 text-sm text-amber-300">
@@ -47,9 +47,6 @@
                 </div>
                 <div class="block mt-2 space-y-6">
                   <h3 class="text-2xl font-semibold leading-none tracking-tighter text-stone-50">[NAME]</h3>
-                  <p class="text-sm text-amber-300">
-                    Movies: [FILMS]
-                  </p>
                   <div class="flex items-center mt-6">
                     <p class="text-sm font-medium text-stone-400">[PRICE] credits</p>
                   </div>
@@ -68,8 +65,7 @@
           return StarWarsApp.vehicleTemplate
             .replace('[NAME]', name)
             .replace('[MANUFACTURER]', manufacturer)
-            .replace('[PRICE]', cost_in_credits)
-            .replace('[FILMS]', filmNames.join(', '));
+            .replace('[PRICE]', cost_in_credits);
         }
 
         showVehicleLoadingIndicator() {

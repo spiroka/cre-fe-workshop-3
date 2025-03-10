@@ -1,7 +1,3 @@
-function delay() {
-  return new Promise((resolve) => setTimeout(resolve, 1000));
-}
-
 class StarWarsApp {
   static loadingIndicator = '<p class="text-stone-50">Loading...</p>';
 

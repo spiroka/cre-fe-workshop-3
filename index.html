@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="index.js" defer></script>
   </head>
   <body>
     <main class="bg-slate-900 min-h-screen">
@@ -32,53 +33,5 @@
         <div id="starships" class="grid w-full grid-cols-1 gap-12 mx-auto lg:grid-cols-3"></div>
       </section>
     </main>
-    <script>
-      function delay() {
-        return new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-
-      class StarWarsApp {
-        static vehicleTemplate = `
-          <div class="flex flex-col mb-12 overflow-hidden vehicle">
-            <div class="flex flex-col justify-between flex-1">
-              <div class="flex-1">
-                <div class="pt-6 space-x-1 text-sm text-amber-300">
-                  [MANUFACTURER]
-                </div>
-                <div class="block mt-2 space-y-6">
-                  <h3 class="text-2xl font-semibold leading-none tracking-tighter text-stone-50">[NAME]</h3>
-                  <div class="flex items-center mt-6">
-                    <p class="text-sm font-medium text-stone-400">[PRICE] credits</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-
-        static loadingIndicator = '<p class="text-stone-50">Loading...</p>';
-
-        init() {
-        }
-
-        renderVehicle({ name, manufacturer, cost_in_credits, filmNames = [] }) {
-          return StarWarsApp.vehicleTemplate
-            .replace('[NAME]', name)
-            .replace('[MANUFACTURER]', manufacturer)
-            .replace('[PRICE]', cost_in_credits);
-        }
-
-        showVehicleLoadingIndicator() {
-          document.getElementById('vehicles').innerHTML = StarWarsApp.loadingIndicator;
-        }
-
-        showStarshipLoadingIndicator() {
-          document.getElementById('starships').innerHTML = StarWarsApp.loadingIndicator;
-        }
-      }
-
-      const app = new StarWarsApp();
-      app.init();
-    </script>
   </body>
 </html>
